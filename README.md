@@ -16,3 +16,21 @@ This repository provides a simple automation solution for startups or small envi
 
 ```bash
 cp shutdown_esxi.sh /vmfs/volumes/datastore1/scripts/
+
+2. **Edit the local.sh startup script:**:
+
+```bash
+vi /etc/rc.local.d/local.sh
+
+3. **Make both scripts executable**:
+
+```bash
+chmod +x /vmfs/volumes/datastore1/scripts/shutdown_esxi.sh
+chmod +x /etc/rc.local.d/local.sh
+
+4. **Adjust the cron job time in local.sh**:
+
+```bash
+CRON_LINE="50 13 * * * /vmfs/volumes/datastore1/scripts/shutdown_esxi.sh"
+
+
