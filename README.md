@@ -29,7 +29,32 @@ chmod +x /vmfs/volumes/datastore1/scripts/shutdown_esxi.sh
 chmod +x /etc/rc.local.d/local.sh
 ```
 4. **Adjust the cron job time in local.sh**:
-
+add this line to the '/var/spool/cron/crontabs/root'
 ```bash
-CRON_LINE="50 13 * * * /vmfs/volumes/datastore1/scripts/shutdown_esxi.sh"
+vi /var/spool/cron/crontabs/root
 ```
+```bash
+50 13 * * * /vmfs/volumes/datastore1/scripts/shutdown_esxi.sh
+```
+🔐 Requirements
+
+you need to restart the crond service somehow
+ **(you can search google for a way to do so.. in my case i grep the pid of crond, killed it then started the cron process again)**
+ > ⚠️ incase the setup didnt work as intended the first time ..you just need to restart the esxi first time
+ > ⚠️ so the the script reload crontab regularly and every thing will work just fine
+
+VMware ESXi host (tested on ESXi 6.7+)
+
+Scripts should reside on a persistent datastore
+
+Ensure vim-cmd and esxcli tools are available
+
+Root access to modify cron jobs and local.sh
+
+⚠️ Warnings
+These scripts directly affect production VMs and host state. Use at your own risk.
+
+Not tested on UEFI Secure Boot — local.sh will not run if secure boot is enabled.
+
+✍️ Author
+Mostafa Moaaz
