@@ -29,32 +29,33 @@ chmod +x /vmfs/volumes/datastore1/scripts/shutdown_esxi.sh
 chmod +x /etc/rc.local.d/local.sh
 ```
 4. **Adjust the cron job time in local.sh**:
-add this line to the '/var/spool/cron/crontabs/root'
+Append this line to `/var/spool/cron/crontabs/root` (or let `local.sh` handle it automatically):
+
 ```bash
-vi /var/spool/cron/crontabs/root
+CRON_LINE="50 13 * * * /vmfs/volumes/datastore1/scripts/shutdown_esxi.sh"
 ```
+
+5. **Restart the cron service**:
+You must restart the cron daemon after editing the crontab. Since ESXi doesn’t include standard service management tools, you can do it manually:
 ```bash
-50 13 * * * /vmfs/volumes/datastore1/scripts/shutdown_esxi.sh
+kill $(pidof crond)
+crond
 ```
+> ⚠️ If the setup doesn’t work as expected the first time, simply restart the ESXi host once.
+On subsequent boots, local.sh will auto-reload the cron entry if missing.
+
 🔐 Requirements
+- VMware ESXi host (tested on 6.7+)
 
-you need to restart the crond service somehow
- **(you can search google for a way to do so.. in my case i grep the pid of crond, killed it then started the cron process again)**
- > ⚠️ incase the setup didnt work as intended the first time ..you just need to restart the esxi first time
- > ⚠️ so the the script reload crontab regularly and every thing will work just fine
+- Scripts must be stored on a persistent datastore
 
-VMware ESXi host (tested on ESXi 6.7+)
+- Root access to modify cron jobs and local.sh
 
-Scripts should reside on a persistent datastore
+- vim-cmd and esxcli tools must be available
 
-Ensure vim-cmd and esxcli tools are available
+- Crond must be running for scheduled jobs
 
-Root access to modify cron jobs and local.sh
+> ⚠️ Warnings
+These scripts directly affect production VMs and host shutdown. Use at your own risk.
 
-⚠️ Warnings
-These scripts directly affect production VMs and host state. Use at your own risk.
-
-Not tested on UEFI Secure Boot — local.sh will not run if secure boot is enabled.
-
-✍️ Author
-Mostafa Moaaz
+Not tested with UEFI Secure Boot — local.sh will not run if Secure Boot is enabled.

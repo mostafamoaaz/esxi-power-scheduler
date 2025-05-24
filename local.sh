@@ -43,16 +43,17 @@ done
 
 
 # Re-add cron job after reboot
-# PLEASE ADJUST THE TIME IN CRONJOB TO WHAT YOU P
+# PLEASE ADJUST THE TIME IN CRONJOB TO WHAT YOU PLEASE
 CRON_LINE="50 13 * * * /vmfs/volumes/datastore1/scripts/shutdown_esxi.sh"
 CRON_FILE="/var/spool/cron/crontabs/root"
 
-[ -f "$CRON_FILE" ] || touch "$CRON_FILE"
+# careful with using this line as typically cron file contain already crucial jobs
+#[ -f "$CRON_FILE" ] || touch "$CRON_FILE"
 
-# Check if it's already in cron; if not, add it
-if ! grep -F "$CRON_LINE" "$CRON_FILE" > /dev/null 2>&1; then
+# Only append if the line doesn't already exist
+if [ -f "$CRON_FILE" ] && ! grep -Fxq "$CRON_LINE" "$CRON_FILE"; then
     echo "$CRON_LINE" >> "$CRON_FILE"
-    log_message "Added shutdown schedule to cron"
+    log_message "Added shutdown schedule to cron file"
+else
+    log_message "Shutdown schedule already exists or cron file missing"
 fi
-
-exit 0
